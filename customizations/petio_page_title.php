@@ -12,9 +12,9 @@ function petio_page_title() {
 	global $post; ?>
 	<div class="content-title-heading">
 		<?php 
-         petio_shop_back_button(); 
+        // petio_shop_back_button(); 
         ?>
-<!--  <span class="back-to-shop"><?php echo apply_filters( 'woocommerce_page_title', esc_html__('Shop', 'petio') ); ?></span>  -->
+  <span class="back-to-shop"><?php echo apply_filters( 'woocommerce_page_title', esc_html__('Shop', 'petio') ); ?></span>  
 		<h1 class="text-title-heading">
 			<?php						
 			if( is_category() ) :

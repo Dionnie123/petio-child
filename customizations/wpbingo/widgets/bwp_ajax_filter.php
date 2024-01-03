@@ -1,15 +1,4 @@
-
-
-
 <?php
-
-/*
-WPBingo Plugin Ajax Filter Override File
-
-Location: plugins/wpbingo/widgets/bwp_ajax_filter.php
-
-*/
-
 class bwp_ajax_filter_widget extends WP_Widget {
 
 	function __construct(){
@@ -605,7 +594,7 @@ class bwp_ajax_filter_widget extends WP_Widget {
 /*OVERRIDE CODE MARK DIONNIE BULINGIT GWF DEV */
 /* This makes the Category filtered nested parent - child */
 
-	/* function woocommerce_filter_category($id_category){
+/*	 function woocommerce_filter_category($id_category){
 		$terms = get_terms( 'product_cat', array('hide_empty' => true) );
 		if($terms){
 			echo '<div class="bwp-filter bwp-filter-category">';
@@ -621,49 +610,70 @@ class bwp_ajax_filter_widget extends WP_Widget {
 			echo '</div></div>';
 		}
 	} */
+
+
+
 function woocommerce_filter_category($id_category){
+
+function render_child_categories($parent_id, $level = 1){
     $args = array(
-        'taxonomy'     => 'product_cat',
-        'hide_empty'   => false,
-        'parent'       => 0, // Fetch only top-level parent categories
+        'taxonomy'   => 'product_cat',
+        'hide_empty' => true,
+        'parent'     => $parent_id,
     );
+    $child_terms = get_terms($args);
+    if($child_terms){
+        foreach ($child_terms as $child_term) {
+            $total_count = woocommerce_get_category_product_count($child_term->term_id);
+     echo '<div data-id_category="'.$child_term->term_id.'" class="item-category item-subcategory level-'.$level.''.(($option_is_set == 1) ? 'active' : '').'">';
+            echo '<label class="name">'.esc_html($child_term->name).'</label>';
+            echo '<div class="count">'.esc_html($total_count).'</div>';
+            echo '</div>';
+            render_child_categories($child_term->term_id, $level + 1);
+        }
+    }
+}
 
-    $top_level_categories = get_categories($args);
 
-    if($top_level_categories){
+function woocommerce_get_category_product_count($category_id) {
+    $args = array(
+        'post_type'      => 'product',
+        'posts_per_page' => -1,
+        'tax_query'      => array(
+            array(
+                'taxonomy' => 'product_cat',
+                'field'    => 'term_id',
+                'terms'    => $category_id,
+                'include_children' => true,
+            ),
+        ),
+    );
+    $products = new WP_Query($args);
+    return $products->found_posts;
+}
+    $args = array(
+        'taxonomy'   => 'product_cat',
+        'hide_empty' => true,
+        'parent'     => 0, // Get only top-level categories
+    );
+    $terms = get_terms($args);
+    if($terms){
         echo '<div class="bwp-filter bwp-filter-category">';
         echo '<h3>'.esc_html__('Categories','wpbingo').'</h3>';
         echo '<div id="pa_category" class="filter_category_product">';
-        foreach ($top_level_categories as $term) {
+        foreach ($terms as $term) {
             $option_is_set = ($term->term_id == $id_category) ? 1 : 0;
-            echo '<div data-id_category="'.$term->term_id.'" class="item-category '.( ($option_is_set == 1) ?  'active' : '' ).'">';
+            $total_count = woocommerce_get_category_product_count($term->term_id);
+            echo '<div data-id_category="'.$term->term_id.'" class="item-category '.(($option_is_set == 1) ? 'active' : '').'">';
             echo '<label class="name">'.esc_html($term->name).'</label>';
-            echo '<div class="count">'.($term->count).'</div>';
+            echo '<div class="count">'.esc_html($total_count).'</div>';
             echo '</div>';
-
-            // Check if the category has children
-            $subargs = array(
-                'taxonomy'     => 'product_cat',
-                'hide_empty'   => false,
-                'parent'       => $term->term_id, // Get children of this category
-            );
-
-            $subcategories = get_categories($subargs);
-
-            if ($subcategories) {
-                echo '<div id="pa_category" class="subcategories filter_category_product" style="margin-left:20px" >';
-                foreach ($subcategories as $subcategory) {
-                    echo '<div data-id_category="'.$subcategory->term_id.'" class="item-category">';
-                    echo '<label class="name">'.esc_html($subcategory->name).'</label>';
-                    echo '<div class="count">'.($subcategory->count).'</div>';
-                    echo '</div>';
-                }
-                echo '</div>';
-            }
+            render_child_categories($term->term_id);
         }
         echo '</div></div>';
     }
 }
+
 /*END OF OVERRIDE CODE MARK DIONNIE BULINGIT GWF DEV */
 
 }
