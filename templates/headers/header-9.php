@@ -83,16 +83,19 @@
 	                                <?php if (is_user_logged_in()) { ?>
 	                                <?php if(is_active_sidebar('top-link')){ ?>
 	                                <div class="block-top-link">
+									
 	                                    <?php dynamic_sidebar( 'top-link' ); ?>
 	                                </div>
 	                                <?php } ?>
 	                                <?php }else{ ?>
-	                                <a class="active-login" href="#"><i class="wpb-icon-user2"></i></a>
+	                                <a class="active-login" href="#"><i class="wpb-icon-user2"></i>	</a>
+								
 	                                <?php petio_login_form(); ?>
 	                                <?php } ?>
 	                            </div>
 	                            <?php if($show_wishlist && class_exists( 'WPCleverWoosw' )){ ?>
 	                            <div class="wishlist-box">
+						
 	                                <a href="<?php echo WPcleverWoosw::get_url(); ?>"><i class="icon-heart"></i></a>
 	                            </div>
 	                            <?php } ?>
@@ -100,6 +103,7 @@
 	                            <div
 	                                class="petio-topcart <?php echo esc_attr($cart_layout); ?> <?php echo esc_attr($cart_style); ?>">
 	                                <?php get_template_part( 'woocommerce/minicart-ajax' ); ?>
+								
 	                            </div>
 	                            <?php } ?>
 	                        </div>
